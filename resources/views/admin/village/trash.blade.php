@@ -29,7 +29,7 @@
                 <h3 class="card-title">Show Data Type Trash</h3>
                 <div class="row float-right">
                     <button class="btn btn-success mr-1"
-                        onclick="document.location.href='{{ route('admin.village.trash.restoreall',$user_uuid) }}'">
+                        onclick="confirmRestore('restoreall')">
                         Restore All
                     </button>
                     <button type="button" class="btn btn-danger" title="Permanent Delete"
@@ -54,7 +54,7 @@
                             <td>
                                 <div class="btn-group" role="group" aria-label="Action">
                                     <button class="btn btn-success mr-1"
-                                        onclick="window.location.href='{{ route('admin.village.trash.restore',$v->id) }}'">
+                                        onclick="confirmRestore('{{ $v->id }}')">
                                         Restore
                                     </button>
                                     <button type="button" class="btn btn-danger"
@@ -92,7 +92,7 @@
                 icon: 'success',
                 title: "{{ session('success') }}",
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 1800,
                 timerProgressBar: true
             });
         @endif
@@ -101,7 +101,7 @@
                 icon: 'danger',
                 title: "{{ session('error') }}",
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 1800,
                 timerProgressBar: true
             })
         @endif
@@ -124,7 +124,7 @@
                     Swal.fire({
                         title: "Deleting all data Permanent",
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 2500,
                         timerProgressBar: true,
                         onOpen: ()=>{
                             window.location.href=url;
@@ -138,7 +138,7 @@
                     Swal.fire({
                         title: "Deleting permanent",
                         showConfirmButton: false,
-                        timer: 1900,
+                        timer: 2100,
                         timerProgressBar: true,
                         allowOutsideClick: false,
                         onOpen: ()=>{
@@ -147,6 +147,53 @@
                         }
                     });
                 }
+            }
+        });
+    }
+
+    function confirmRestore(uuid){
+        let teks = '';
+        if (uuid == 'restoreall') {
+            teks = 'This action will restore all data!';
+        } else {
+            teks = 'This action will restore the data!';
+        }
+        Swal.fire({
+            title: "Are you sure?",
+            text: teks,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, restore it!',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.value) {
+                let url = '';
+                let kalimat = '';
+                let timer = 0;
+                if (uuid=='restoreall') {
+                    url = '{{ route("admin.village.trash.restoreall",$user_uuid) }}';
+                    kalimat = 'Restoring all data';
+                    timer = 2100;
+                } else {
+                    let id = uuid;
+                    url = '{{ route("admin.village.trash.restore",":id") }}';
+                    kalimat = 'Restoring the data';
+                    timer = 2100;
+                    url = url.replace(':id', id);
+                }
+                Swal.fire({
+                    title: kalimat,
+                    showConfirmButton: false,
+                    timer: timer,
+                    timerProgressBar: true,
+                    allowOutsideClick: false,
+                    onOpen: ()=>{
+                        window.location.href=url;
+                        Swal.showLoading();
+                    }
+                });
             }
         });
     }

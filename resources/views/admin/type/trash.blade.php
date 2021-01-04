@@ -28,8 +28,7 @@
             <div class="card-header">
                 <h3 class="card-title">Show Data Type Trash</h3>
                 <div class="row float-right">
-                    <button class="btn btn-success mr-1"
-                        onclick="document.location.href='{{ route('admin.type.trash.restoreall',Auth::user()->id) }}'">
+                    <button type="button" class="btn btn-success mr-1" onclick="confirmRestore('restoreall')">
                         Restore All
                     </button>
                     <button type="button" class="btn btn-danger" title="Permanent Delete"
@@ -56,7 +55,7 @@
                             <td>
                                 <div class="btn-group" role="group" aria-label="Action">
                                     <button class="btn btn-success mr-1"
-                                        onclick="document.location.href='{{ route('admin.type.trash.restore',$tipe->id) }}'">
+                                        onclick="confirmRestore('{{ $tipe->id }}')">
                                         Restore
                                     </button>
                                     <button type="button" class="btn btn-danger"
@@ -122,34 +121,74 @@
         }).then((result) => {
             if (result.value) {
                 if (uuid=='deleteall') {
-                    let url = '{{ route("admin.type.trash.deleteall",Auth::user()->id) }}';
-                    Swal.fire({
-                        title: "Deleting all data Permanent",
-                        showConfirmButton: false,
-                        timer: 2100,
-                        timerProgressBar: true,
-                        allowOutsideClick: false,
-                        onOpen: ()=>{
-                            window.location.href=url;
-                            Swal.showLoading();
-                        }
-                    });
+                    url = '{{ route("admin.type.trash.deleteall",$user_uuid) }}';
+                    kalimat = 'Deleting all data permanently';
+                    timer = 2100;
                 } else {
                     let id = uuid;
-                    let url = '{{ route("admin.type.trash.delete",":id") }}';
+                    url = '{{ route("admin.type.trash.delete",":id") }}';
+                    kalimat = 'Deleting the data permanently';
+                    timer = 2100;
                     url = url.replace(':id', id);
-                    Swal.fire({
-                        title: "Deleting permanent",
-                        showConfirmButton: false,
-                        timer: 2000,
-                        timerProgressBar: true,
-                        allowOutsideClick: false,
-                        onOpen: ()=>{
-                            window.location.href=url;
-                            Swal.showLoading();
-                        }
-                    });
                 }
+                Swal.fire({
+                    title: "Deleting all data Permanent",
+                    showConfirmButton: false,
+                    timer: 2100,
+                    timerProgressBar: true,
+                    allowOutsideClick: false,
+                    onOpen: ()=>{
+                        window.location.href=url;
+                        Swal.showLoading();
+                    }
+                });
+            }
+        });
+    }
+
+    function confirmRestore(uuid){
+        let teks = '';
+        if (uuid == 'restoreall') {
+            teks = 'This action will restore all data!';
+        } else {
+            teks = 'This action will restore the data!';
+        }
+        Swal.fire({
+            title: "Are you sure?",
+            text: teks,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, restore it!',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.value) {
+                let url = '';
+                let kalimat = '';
+                let timer = 0;
+                if (uuid=='restoreall') {
+                    url = '{{ route("admin.type.trash.restoreall",$user_uuid) }}';
+                    kalimat = 'Restoring all data';
+                    timer = 2100;
+                } else {
+                    let id = uuid;
+                    url = '{{ route("admin.type.trash.restore",":id") }}';
+                    kalimat = 'Restoring the data';
+                    timer = 2100;
+                    url = url.replace(':id', id);
+                }
+                Swal.fire({
+                    title: kalimat,
+                    showConfirmButton: false,
+                    timer: timer,
+                    timerProgressBar: true,
+                    allowOutsideClick: false,
+                    onOpen: ()=>{
+                        window.location.href=url;
+                        Swal.showLoading();
+                    }
+                });
             }
         });
     }

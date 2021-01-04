@@ -99,18 +99,24 @@ class VillageController extends Controller
     public function restoreData($id)
     {
         $village = Village::onlyTrashed()->find($id);
-        $village->update(['deleted_by'=>null]);
-        $village->restore();
-
-        return back()->with('success', "Berhasil merestore data");
+        if ($village->exists){
+            $village->update(['deleted_by'=>null]);
+            $village->restore();
+            return back()->with('success', "Berhasil merestore data");
+        } else {
+            return back()->with('success', "Gagal merestore data");
+        }
     }
     
     public function deleteData($id)
     {
         $village = Village::onlyTrashed()->find($id);
-        $village->forceDelete();
-        
-        return back()->with('success', 'Berhasil menghapus permanen');
+        if($village->exists){
+            $village->forceDelete();
+            return back()->with('success', 'Berhasil menghapus permanen');
+        } else {
+            return back()->with('error', 'Gagal mengahapus');
+        }
     }
 
     public function restoreAllData($uuid)

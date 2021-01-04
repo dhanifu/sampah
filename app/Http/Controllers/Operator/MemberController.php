@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Models\Village;
 use Illuminate\Http\Request;
-use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Str;
 use Auth;
 
 class MemberController extends Controller
@@ -47,19 +47,15 @@ class MemberController extends Controller
             'rt' => 'required', 'rw' => 'required', 'address' => 'required|string'
         ]);
 
-        $uuid = Uuid::uuid4();
-        $created_by = Auth::user()->uuid;
-
         try {
             $member = Member::create([
-                'uuid' => $uuid, 'name' => $request->name,
-                'birth_date' => $request->birth_date, 'gender' => $request->gender,
-                'address' => $request->address, 'village_id' => $request->village_id,
+                'name' => $request->name, 'birth_date' => $request->birth_date,
+                'gender' => $request->gender, 'address' => $request->address,
+                'village_id' => $request->village_id,
                 'rt' => $request->rt, 'rw' => $request->rw,
-                'created_by' => $created_by
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
-            return redirect()->back()->with('error', "Gagal menambah member, error: tidak diketahui");
+            return redirect()->back()->with('error', "Gagal menambah member");
         }
 
         if ($member->exists) {
@@ -76,11 +72,10 @@ class MemberController extends Controller
      * @param  \App\Models\Member  $member
      * @return \Illuminate\Http\Response
      */
-    public function edit($uuid)
+    public function edit(Member $member)
     {
-        $member = Member::with('village')->where('uuid', $uuid)->orderBy('created_at', 'DESC')->first();
         $villages = Village::orderBy('name','ASC')->get();
-        return view('operator.member.edit', compact('uuid', 'member', 'villages'));
+        return view('operator.member.edit', compact('member', 'villages'));
     }
 
     /**
@@ -90,16 +85,13 @@ class MemberController extends Controller
      * @param  \App\Models\Member  $member
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $uuid)
+    public function update(Request $request, Member $member)
     {
         $this->validate($request, [
             'name' => 'required|string', 'birth_date' => 'required|date',
             'gender' => 'required|string', 'village_id' => 'required|exists:villages,id',
-            'rt' => 'required', 'rw' => 'required', 'address' => 'required|string'
+            'rt' => 'required|min:2|max:2', 'rw' => 'required|min:2|max:2', 'address' => 'required|string'
         ]);
-
-        $updated_by = Auth::user()->uuid;
-        $member = Member::where('uuid', $uuid)->first();
 
         if (!empty($member)) {
             try {
@@ -107,7 +99,7 @@ class MemberController extends Controller
                     'name' => $request->name, 'birth_date' => $request->birth_date,
                     'gender' => $request->gender, 'village_id' => $request->village_id,
                     'rt' => $request->rt, 'rw' => $request->rw,
-                    'address' => $request->address, 'updated_by' => $updated_by
+                    'address' => $request->address,
                 ]);
                 return redirect()->route('operator.member.data.index')->with('success', 'Berhasil mengedit member');
             } catch (\Illuminate\Database\QueryException $e) {
@@ -125,19 +117,15 @@ class MemberController extends Controller
      * @param  \App\Models\Member  $member
      * @return \Illuminate\Http\Response
      */
-    public function destroy($uuid)
+    public function destroy(Member $member)
     {
-        $deleted_by = Auth::user()->uuid;
-        $member = Member::where('uuid', $uuid)->first();
-
         if (!empty($member)) {
             try {
-                $member->update(['deleted_by'=>$deleted_by]);
                 $member->delete();
-                return back()->with('success', 'Member dihapus');
-            } catch (\Throwable $th) {
-                return back()->with('error', '');
+            } catch (\Illuminate\Database\QueryException $e) {
+                return back()->with('error', 'Gagal menghapus. error');
             }
+            return back()->with('success', 'Member dihapus');
         } else {
             return back()->with('error', 'Gagal menghapus member');
         }
@@ -146,14 +134,14 @@ class MemberController extends Controller
     // TRASH
     public function trash()
     {
-        $user_uuid = Auth::user()->uuid;
-        $members = Member::with('village')->onlyTrashed()->get();
+        $user_uuid = Auth::user()->id;
+        $members = Member::with('village')->onlyTrashed()->orderBy('deleted_at', 'DESC')->get();
         return view('operator.member.trash', compact('members', 'user_uuid'));
     }
 
-    public function restoreData($uuid)
+    public function restoreData($id)
     {
-        $member = Member::onlyTrashed()->where('uuid', $uuid)->first();
+        $member = Member::onlyTrashed()->find($id);
         if ($member->exists) {
             $member->update(['deleted_by'=>null]);
             $member->restore();
@@ -164,9 +152,9 @@ class MemberController extends Controller
     }
 
     
-    public function deleteData($uuid)
+    public function deleteData($id)
     {
-        $member = Member::onlyTrashed()->where('uuid', $uuid)->first();
+        $member = Member::onlyTrashed()->find($id);
         
         if ($member->exists) {
             $member->update(['deleted_by'=>null]);
@@ -189,7 +177,6 @@ class MemberController extends Controller
     public function deleteAllData($uuid)
     {
         $member = Member::onlyTrashed();
-        $member->update(['deleted_by'=>null]);
         $member->forceDelete();
 
         return back()->with('success', 'Semua sampah berhasil dihapus secara permanen');

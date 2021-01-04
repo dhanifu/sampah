@@ -65,15 +65,15 @@
                                         <i class="far fa-eye"></i>
                                     </button>
                                     <button type="button" class="btn btn-info"
-                                        onclick="document.location.href='{{ route('operator.member.data.edit',$member->uuid) }}'">
+                                        onclick="document.location.href='{{ route('operator.member.data.edit',$member->id) }}'">
                                         <i class="far fa-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger"
-                                        onclick="confirmDelete('{{$member->uuid}}')">
+                                        onclick="confirmDelete('{{$member->id}}')">
                                         <i class="far fa-trash-alt"></i>
                                     </button>
-                                    <form id="data-{{$member->uuid}}"
-                                        action="{{route('operator.member.data.destroy', $member->uuid)}}" method="POST">
+                                    <form id="data-{{$member->id}}"
+                                        action="{{route('operator.member.data.destroy', $member->id)}}" method="POST">
                                         @csrf
                                         @method('DELETE')
                                     </form>
@@ -109,32 +109,32 @@
                             <label class="col-md-2 col-form-label">Name</label>
                             <div class="col-sm-1 d-none d-md-block"><span>:</span></div>
                             <div class="col-md-9">
-                                <p class="form-control bg-light" id="detail-name"></p>
+                                <p class="form-control bg-light" id="detail-name" disabled></p>
                             </div>
                             <label class="col-md-2 col-form-label">Birth Date</label>
                             <div class="col-sm-1 d-none d-md-block"><span>:</span></div>
                             <div class="col-md-9">
-                                <p class="form-control bg-light" id="detail-birth"></p>
+                                <p class="form-control bg-light" id="detail-birth" disabled></p>
                             </div>
                             <label class="col-md-2 col-form-label">Gender</label>
                             <div class="col-sm-1 d-none d-md-block"><span>:</span></div>
                             <div class="col-md-9">
-                                <p class="form-control bg-light" id="detail-gender"></p>
+                                <p class="form-control bg-light" id="detail-gender" disabled></p>
                             </div>
                             <label class="col-md-2 col-form-label">Rt/Rw</label>
                             <div class="col-sm-1 d-none d-md-block"><span>:</span></div>
                             <div class="col-md-9">
-                                <p class="form-control bg-light" id="detail-rtrw"></p>
+                                <p class="form-control bg-light" id="detail-rtrw" disabled></p>
                             </div>
                             <label class="col-md-2 col-form-label">Village</label>
                             <div class="col-sm-1 d-none d-md-block"><span>:</span></div>
                             <div class="col-md-9">
-                                <p class="form-control bg-light" id="detail-village"></p>
+                                <p class="form-control bg-light" id="detail-village" disabled></p>
                             </div>
                             <label class="col-md-2 col-form-label">Address</label>
                             <div class="col-sm-1 d-none d-md-block"><span>:</span></div>
                             <div class="col-md-9">
-                                <textarea class="form-control bg-light" id="detail-address" rows="3"></textarea>
+                                <textarea class="form-control bg-light" id="detail-address" rows="3" disabled></textarea>
                             </div>
                         </div>
                     </div>
