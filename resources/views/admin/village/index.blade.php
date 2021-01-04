@@ -185,7 +185,7 @@
             Swal.fire({
                 title: "Saving data",
                 showConfirmButton: false,
-                timer: 1900,
+                timer: 2100,
                 timerProgressBar: true,
                 onOpen: ()=>{
                     Swal.showLoading();
@@ -209,7 +209,7 @@
                 Swal.fire({
                     title: "Deleting to trash",
                     showConfirmButton: false,
-                    timer: 2000,
+                    timer: 2100,
                     timerProgressBar: true,
                     allowOutsideClick: false,
                     onOpen: ()=>{

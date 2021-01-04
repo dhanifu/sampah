@@ -74,26 +74,34 @@ class TypeController extends Controller
     
     public function trash()
     {
+        $user_uuid = Auth::user()->id;
         $types = Type::onlyTrashed()->get();
-        return view('admin.type.trash', compact('types'));
+        return view('admin.type.trash', compact('types', 'user_uuid'));
     }
 
     public function restoreData($id)
     {
         $type = Type::onlyTrashed()->find($id);
-        $type->update(['deleted_by'=>null]);
-        $type->restore();
+        if ($type->exists){
+            $type->update(['deleted_by'=>null]);
+            $type->restore();
+            return back()->with('success', "Berhasil merestore data");
+        } else{
+            return back()->with('success', "Gagal merestore data");
+        }
 
-        return back()->with('success', "Berhasil merestore data");
     }
 
     
     public function deleteData($id)
     {
         $type = Type::onlyTrashed()->find($id);
-        $type->forceDelete();
-        
-        return back()->with('success', 'Berhasil menghapus permanen');
+        if($type->exists) {
+            $type->forceDelete();    
+            return back()->with('success', 'Berhasil menghapus permanen');
+        } else {
+            return back()->with('error', 'Gagal mengahapus');
+        }
     }
 
     public function restoreAllData($uuid)

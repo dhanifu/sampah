@@ -200,7 +200,7 @@
         Swal.fire({
             title: "Saving data",
             showConfirmButton: false,
-            timer: 1900,
+            timer: 2000,
             timerProgressBar: true,
             onOpen: ()=>{
                 Swal.showLoading();
@@ -223,7 +223,7 @@
                 Swal.fire({
                     title: "Deleting to trash",
                     showConfirmButton: false,
-                    timer: 2000,
+                    timer: 2300,
                     timerProgressBar: true,
                     onOpen: ()=>{
                         $('#data-' + id).submit();
