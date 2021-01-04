@@ -65,11 +65,11 @@
                                         Detail
                                     </button>
                                     <button type="button" class="btn btn-success ml-1"
-                                        onclick="confirmRestore('{{$m->uuid}}')">
+                                        onclick="confirmRestore('{{$m->id}}')">
                                         Restore
                                     </button>
                                     <button type="button" class="btn btn-danger ml-1"
-                                        onclick="confirmDelete('{{$m->uuid}}')">
+                                        onclick="confirmDelete('{{$m->id}}')">
                                         Delete Rermanent
                                     </button>
                                 </div>
@@ -212,12 +212,12 @@
                 if (uuid=='deleteall') {
                     url = '{{ route("operator.member.trash.deleteall",$user_uuid) }}';
                     kalimat = 'Deleting all data permanently';
-                    timer = 2000;
+                    timer = 2100;
                 } else {
                     let id = uuid;
-                    url = '{{ route("admin.village.trash.delete",":id") }}';
+                    url = '{{ route("operator.member.trash.delete",":id") }}';
                     kalimat = 'Deleting the data permanently';
-                    timer = 1900;
+                    timer = 2000;
                     url = url.replace(':id', id);
                 }
                 Swal.fire({
@@ -263,7 +263,7 @@
                     let id = uuid;
                     url = '{{ route("operator.member.trash.restore",":id") }}';
                     kalimat = 'Restoring the data';
-                    timer = 1900;
+                    timer = 2000;
                     url = url.replace(':id', id);
                 }
                 Swal.fire({

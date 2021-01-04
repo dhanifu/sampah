@@ -28,7 +28,7 @@
                 </div>
             </div>
             <!-- /.card-header -->
-            <form action="{{ route('operator.member.data.update', $uuid) }}" method="POST" role="form">
+            <form action="{{ route('operator.member.data.update', $member->id) }}" method="POST" role="form">
                 @csrf
                 @method('PUT')
                 <div class="card-body">
