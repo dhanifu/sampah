@@ -52,7 +52,7 @@
                                 <div class="btn-group" role="group" aria-label="Action">
                                     <button type="button" class="btn btn-info mr-1" data-toggle="modal" data-target="#modal"
                                         data-tipemodal="edit" data-id="{{$tipe->id}}" data-name="{{$tipe->name}}"
-                                        data-price="{{$tipe->price}}">
+                                        data-price="{{number_format($tipe->price)}}" id="btnEdit">
                                         <i class="far fa-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger"
@@ -103,7 +103,7 @@
                         <div class="row">
                             <label for="price" class="col-md-3 col-form-label">Price</label>
                             <div class="col-md-9">
-                                <input id="price" type="number" class="form-control"
+                                <input id="price" type="text" class="form-control"
                                     name="price" value="{{ old('price') }}" placeholder="Price">
                                 <p class="text-danger">{{ $errors->first('price') }}</p>
                             </div>
@@ -112,7 +112,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary" id="btnsubmit" disabled>Save</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" id="close" data-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>
@@ -128,6 +128,13 @@
 <script src="{{ asset('admin/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
 
 <script>
+    const harga = document.getElementById('price')
+    harga.addEventListener('keyup', function(){
+        const number = Number(this.value.replace(/\D/g, ''))
+        const price = new Intl.NumberFormat().format(number)
+        
+        this.value = price.split('.').join(',')
+    })
     $(function(){
         $('#datatable').DataTable({
             "responsive": true,
@@ -143,7 +150,7 @@
                 icon: 'success',
                 title: "{{ session('success') }}",
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 1000,
             });
         @endif
         @if(session('error'))
@@ -151,10 +158,49 @@
                 icon: 'danger',
                 title: "{{ session('error') }}",
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 1000,
             })
         @endif
+        
+        $('#name').keyup(function(e){
+            if (e.which <= 90 && e.which >= 48)
+            {
+                if ($(this).val() && $('#price').val()) {
+                    $('#btnsubmit').attr('disabled', false);
+                }else{
+                    $('#btnsubmit').attr('disabled', true);
+                }
+            }
+        });
+        $('#price').keyup(function(e){
+            if (e.which <= 90 && e.which >= 48)
+            {
+                if ($(this).val() && $('#price').val()) {
+                    $('#btnsubmit').attr('disabled', false);
+                }else{
+                    $('#btnsubmit').attr('disabled', true);
+                }
+            }
+        });
 
+        $("#btnEdit").click(function(){
+            let button = attribute => {
+                return $(this).attr(`data-${attribute}`)
+            }
+            let name = button('name')
+            let price = button('price')
+            
+            $("#name").val(name)
+            $('#price').val(price)
+            
+            if ($('#name').val() == name) {
+                $("#btnsubmit").attr('disabled', true)
+            } else if ($('#price').val() == price) {
+                $("#btnsubmit").attr('disabled', true)
+            } else {
+                $("#btnsubmit").attr('disabled', false)
+            }
+        })
 
         $('#modal').on('show.bs.modal', function(e){
             let button = $(e.relatedTarget);
@@ -165,6 +211,9 @@
                 modal.find('#form-modal #buatmethod').html('');
                 let url = "{{route('admin.type.store')}}";
                 modal.find('#form-modal').attr('action', url);
+                modal.find('.modal-body #name').val('');
+                modal.find('.modal-body #price').val('');
+                $('#btnsubmit').attr('disabled', true);
             }
             if (tipemodal == "edit") {
                 modal.find('#form-modal #buatmethod').html(`@method('put')`);
@@ -176,22 +225,11 @@
                 modal.find('#form-modal').attr('action', url);
                 modal.find('.modal-body #name').val(name);
                 modal.find('.modal-body #price').val(price)
+                
+                $("#close").click(function(){
+                    modal.find('input').val('')
+                })
             }
-
-            $('#name').keyup(function(){
-                if ($(this).val() && $('#price').val()) {
-                    $('#btnsubmit').attr('disabled', false);
-                }else{
-                    $('#btnsubmit').attr('disabled', true);
-                }
-            });
-            $('#price').keyup(function(){
-                if ($(this).val() && $('#name').val()) {
-                    $('#btnsubmit').attr('disabled', false);
-                }else{
-                    $('#btnsubmit').attr('disabled', true);
-                }
-            });
         });
     });
 
@@ -200,8 +238,7 @@
         Swal.fire({
             title: "Saving data",
             showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
+            timer: 3000,
             onOpen: ()=>{
                 Swal.showLoading();
             }
@@ -223,8 +260,7 @@
                 Swal.fire({
                     title: "Deleting to trash",
                     showConfirmButton: false,
-                    timer: 2300,
-                    timerProgressBar: true,
+                    timer: 3000,
                     onOpen: ()=>{
                         $('#data-' + id).submit();
                         Swal.showLoading();
