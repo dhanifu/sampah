@@ -61,6 +61,15 @@
                         </p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('operator.transaction.index') }}"
+                        class="nav-link {{ request()->routeIs('operator.transaction.*')?'active':'' }}">
+                        <i class="nav-icon fas fa-money-bill"></i>
+                        <p>
+                            Transaksi
+                        </p>
+                    </a>
+                </li>
                 @endrole
 
                 <li class="nav-header">Recycle Bin</li>
