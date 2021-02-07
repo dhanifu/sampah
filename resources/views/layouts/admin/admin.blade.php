@@ -110,8 +110,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     Swal.fire({
                         title: "You're logged out!",
                         showConfirmButton: false,
-                        timer: 4000,
-                        timerProgressBar: true,
+                        timer: 5000,
                         allowOutsideClick: false,
                         onOpen: ()=>{
                             document.getElementById('logout-form').submit();
