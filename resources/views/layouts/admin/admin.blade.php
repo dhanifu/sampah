@@ -30,23 +30,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
-    <style>
-        /* Blur SweetALert2 */
-        body.swal2-shown > [aria-hidden="true"] {
-            filter: blur(5px);
-        }
-        body > * {
-            transition: 0.1s filter linear;
-        }
-        body.modal-open .wrapper {
-            -webkit-filter: blur(1px);
-            -moz-filter: blur(1px);
-            -o-filter: blur(1px);
-            -ms-filter: blur(1px);
-            filter: blur(4px);
-        }
-    </style>
-
     <!-- Jika ada tambahan -->
     @yield('head')
 </head>
