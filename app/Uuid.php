@@ -16,7 +16,9 @@ trait Uuid
             $model->incrementing = false;
             $model->keyType = 'string';
             $model->{$model->getKeyName()} = Str::uuid()->toString();
-            $model->created_by = Auth::user()->id;
+            if (Auth::check()) {
+                $model->created_by = Auth::user()->id;
+            }
         });
 
         static::updating(function ($model) {

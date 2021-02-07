@@ -93,8 +93,7 @@
                 icon: 'success',
                 title: "{{ session('success') }}",
                 showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true
+                timer: 1000,
             });
         @endif
         @if(session('error'))
@@ -102,8 +101,7 @@
                 icon: 'danger',
                 title: "{{ session('error') }}",
                 showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true
+                timer: 1000,
             })
         @endif
     });
@@ -123,19 +121,18 @@
                 if (uuid=='deleteall') {
                     url = '{{ route("admin.type.trash.deleteall",$user_uuid) }}';
                     kalimat = 'Deleting all data permanently';
-                    timer = 2100;
+                    timer = 3000;
                 } else {
                     let id = uuid;
                     url = '{{ route("admin.type.trash.delete",":id") }}';
                     kalimat = 'Deleting the data permanently';
-                    timer = 2100;
+                    timer = 3000;
                     url = url.replace(':id', id);
                 }
                 Swal.fire({
                     title: "Deleting all data Permanent",
                     showConfirmButton: false,
-                    timer: 2100,
-                    timerProgressBar: true,
+                    timer: 3000,
                     allowOutsideClick: false,
                     onOpen: ()=>{
                         window.location.href=url;
@@ -170,19 +167,18 @@
                 if (uuid=='restoreall') {
                     url = '{{ route("admin.type.trash.restoreall",$user_uuid) }}';
                     kalimat = 'Restoring all data';
-                    timer = 2100;
+                    timer = 3000;
                 } else {
                     let id = uuid;
                     url = '{{ route("admin.type.trash.restore",":id") }}';
                     kalimat = 'Restoring the data';
-                    timer = 2100;
+                    timer = 3000;
                     url = url.replace(':id', id);
                 }
                 Swal.fire({
                     title: kalimat,
                     showConfirmButton: false,
                     timer: timer,
-                    timerProgressBar: true,
                     allowOutsideClick: false,
                     onOpen: ()=>{
                         window.location.href=url;

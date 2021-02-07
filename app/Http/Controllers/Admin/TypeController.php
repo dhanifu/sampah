@@ -23,6 +23,7 @@ class TypeController extends Controller
 
     public function store(Request $request)
     {
+        $request["price"] = intval(str_replace(',','',$request->price));
         $this->validate($request, [
             'name' => 'required|string|unique:types',
             'price' => 'required|integer'
@@ -44,18 +45,30 @@ class TypeController extends Controller
 
     public function update(Request $request, Type $type)
     {
-        $this->validate($request, [
-            'name' => 'required|string|unique:types',
-            'price' => 'required|integer'
-        ]);
+        $request["price"] = intval(str_replace(',','',$request->price));
+        $validation = ['price' => 'required|numeric|digits_between:0,9'];
+        if ($request->name == $type->name) {
+            $validation["name"] = 'required|string';
+        } else {
+            $validation["name"] = 'required|string|unique:types';
+        }
+
+        $this->validate($request, $validation);
 
         $updated_by = Auth::user()->id;
-        
         try {
-            $type->update([
-                'name' => $request->name,
-                'price' => $request->price,
-            ]);
+            if ($request->name == $type->name && $request->price == $type->price){
+                return back()->with('success', 'Tidak mengedit apapun');
+            } elseif ($request->name == $type->name) {
+                $type->update([
+                    'price' => $request->price,
+                ]);
+            }else {
+                $type->update([
+                    'name' => $request->name,
+                    'price' => $request->price,
+                ]);
+            }
 
             return back()->with('success', 'Berhasil mengedit');
         } catch (\Illuminate\Database\QueryException $e) {
