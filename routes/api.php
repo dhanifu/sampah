@@ -17,3 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('get-type', 'Api\TypeController@index')->name('api.get-type');
+Route::get('get-type-object', 'Api\TypeController@show')->name('api.get-type-object');
+
+Route::post('get-member', 'Api\MemberController@index')->name('api.get-member');
