@@ -70,4 +70,9 @@ Route::name('operator.')->middleware('role:operator')->group(function(){
             Route::get('/permanent-delete/all/by/{uuid}', 'Operator\MemberController@deleteAllData')->name('deleteall');
         });
     });
+
+    Route::prefix('transaction')->name('transaction.')->group(function(){
+        Route::get('/', 'Operator\TransactionController@index')->name('index');
+        Route::post('/save', 'Operator\TransactionController@store')->name('store');
+    });
 });
