@@ -16,4 +16,14 @@ class Trash extends Model
     public $incrementing = false;
     protected $guarded = [];
     protected $dates = ['deleted_at'];
+
+    public function user()
+    {
+        return $this->belongsTo(\App\User::class, 'user_id');
+    }
+    
+    public function member()
+    {
+        return $this->belongsTo(Member::class, 'member_id');
+    }
 }

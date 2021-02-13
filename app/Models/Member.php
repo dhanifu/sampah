@@ -19,6 +19,6 @@ class Member extends Model
 
     public function village()
     {
-        return $this->belongsTo('App\Models\Village', 'village_id');
+        return $this->belongsTo(Village::class, 'village_id');
     }
 }

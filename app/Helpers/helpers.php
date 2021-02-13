@@ -23,3 +23,13 @@ function get_village_name($village_id){
     $data = Village::find($village_id);
     return $data->name;
 }
+
+function localDate(string $date): String
+{
+	return date('d M Y', strtotime($date));
+}
+
+function localDateTime(string $date): String
+{
+    return date('d M Y | H:i', strtotime($date));
+}

@@ -70,4 +70,16 @@ Route::name('operator.')->middleware('role:operator')->group(function(){
             Route::get('/permanent-delete/all/by/{uuid}', 'Operator\MemberController@deleteAllData')->name('deleteall');
         });
     });
+
+    Route::prefix('transaction')->name('transaction.')->group(function(){
+        Route::name('data.')->group(function() {
+            Route::get('/', 'Operator\TransactionController@index')->name('index');
+            Route::post('/save', 'Operator\TransactionController@store')->name('store');
+        });
+
+        Route::prefix('history')->name('history.')->group(function(){
+            Route::get('/', 'HistoryController@index')->name('index');
+            Route::get('/detail', 'HistoryController@detail')->name('detail');
+        });
+    });
 });
