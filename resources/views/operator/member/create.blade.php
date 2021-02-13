@@ -31,6 +31,7 @@
             <form action="{{ route('operator.member.data.store') }}" method="POST" role="form">
                 <div class="card-body">
                     @csrf
+                    <input type="hidden" name="previous" value="{!! URL::previous() !!}">
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">

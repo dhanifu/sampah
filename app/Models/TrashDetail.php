@@ -24,6 +24,6 @@ class TrashDetail extends Model
 
     public function type()
     {
-        return $this->belongsTo(\App\Type::class, 'type_id');
+        return $this->belongsTo(Type::class, 'type_id');
     }
 }

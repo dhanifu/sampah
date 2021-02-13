@@ -61,12 +61,24 @@
                         </p>
                     </a>
                 </li>
+
+                <li class="nav-header">Transaksi</li>
                 <li class="nav-item">
-                    <a href="{{ route('operator.transaction.index') }}"
-                        class="nav-link {{ request()->routeIs('operator.transaction.*')?'active':'' }}">
+                    <a href="{{ route('operator.transaction.data.index') }}"
+                        class="nav-link {{ request()->routeIs('operator.transaction.data.*')?'active':'' }}">
                         <i class="nav-icon fas fa-money-bill"></i>
                         <p>
                             Transaksi
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('operator.transaction.history.index') }}"
+                        class="nav-link {{ request()->routeIs('operator.transaction.history.*')?'active':'' }}">
+                        <i class="nav-icon fas fa-history"></i>
+                        <p>
+                            Histori
                         </p>
                     </a>
                 </li>

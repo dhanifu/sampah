@@ -72,7 +72,14 @@ Route::name('operator.')->middleware('role:operator')->group(function(){
     });
 
     Route::prefix('transaction')->name('transaction.')->group(function(){
-        Route::get('/', 'Operator\TransactionController@index')->name('index');
-        Route::post('/save', 'Operator\TransactionController@store')->name('store');
+        Route::name('data.')->group(function() {
+            Route::get('/', 'Operator\TransactionController@index')->name('index');
+            Route::post('/save', 'Operator\TransactionController@store')->name('store');
+        });
+
+        Route::prefix('history')->name('history.')->group(function(){
+            Route::get('/', 'HistoryController@index')->name('index');
+            Route::get('/detail', 'HistoryController@detail')->name('detail');
+        });
     });
 });

@@ -59,7 +59,12 @@ class MemberController extends Controller
         }
 
         if ($member->exists) {
-            return redirect()->route('operator.member.data.index')
+            if ($request->previous == route('operator.transaction.data.index')) {
+                $redirect = 'operator.transaction.data.index';
+            } else {
+                $redirect = 'operator.member.data.index';
+            }
+            return redirect()->route($redirect)
                             ->with('success', 'Berhasil menambah member baru');
         } else {
             return redirect()->back()->with('error', 'Gagal menambah member baru');
