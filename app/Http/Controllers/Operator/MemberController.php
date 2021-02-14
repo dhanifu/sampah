@@ -29,8 +29,24 @@ class MemberController extends Controller
      */
     public function create()
     {
-        $villages = Village::orderBy('name','ASC')->get();
-        return view('operator.member.create', compact('villages'));
+        return view('operator.member.create');
+    }
+
+    public function selectVillage(Request $request)
+    {
+        $villages = Village::select(['id','name'])->where('name', 'like', "{$request->name}%")
+                    ->latest()->get()->take(5);
+        $result = [];
+
+        foreach ($villages as $village) {
+            $result[] = [
+                "id" => $village->id,
+                "text" => $village->name,
+                "name" => $village->name,
+            ];
+        }
+
+        return $result;
     }
 
     /**

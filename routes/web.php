@@ -57,6 +57,7 @@ Route::name('operator.')->middleware('role:operator')->group(function(){
         Route::name('data.')->group(function(){
             Route::get('/', 'Operator\MemberController@index')->name('index');
             Route::get('/add', 'Operator\MemberController@create')->name('create');
+            Route::post('/select-village', 'Operator\MemberController@selectVillage')->name('select-village');
             Route::post('/add', 'Operator\MemberController@store')->name('store');
             Route::get('/{member}/edit', 'Operator\MemberController@edit')->name('edit');
             Route::put('/{member}/edit', 'Operator\MemberController@update')->name('update');
