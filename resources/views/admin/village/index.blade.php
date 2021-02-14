@@ -132,8 +132,7 @@
                 icon: 'success',
                 title: "{{ session('success') }}",
                 showConfirmButton: false,
-                timer: 1500,
-                timerProgressBar: true
+                timer: 1500
             });
         @endif
         @if(session('error'))
@@ -141,8 +140,7 @@
                 icon: 'danger',
                 title: "{{ session('error') }}",
                 showConfirmButton: false,
-                timer: 1500,
-                timerProgressBar: true
+                timer: 1500
             })
         @endif
 
@@ -159,6 +157,7 @@
                 modal.find('#form-modal #buatmethod').html('');
                 let url = "{{route('admin.village.store')}}";
                 modal.find('#form-modal').attr('action', url);
+                modal.find('.modal-body #name').val('');
             }
             if (tipemodal == "edit") {
                 modal.find('#form-modal #buatmethod').html(`@method('put')`);
@@ -185,8 +184,7 @@
             Swal.fire({
                 title: "Saving data",
                 showConfirmButton: false,
-                timer: 2100,
-                timerProgressBar: true,
+                timer: 3000,
                 onOpen: ()=>{
                     Swal.showLoading();
                 }
@@ -209,8 +207,7 @@
                 Swal.fire({
                     title: "Deleting to trash",
                     showConfirmButton: false,
-                    timer: 2100,
-                    timerProgressBar: true,
+                    timer: 3000,
                     allowOutsideClick: false,
                     onOpen: ()=>{
                         $('#data-' + id).submit();
