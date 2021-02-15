@@ -116,7 +116,17 @@
                         </p>
                     </a>
                 </li>
-                
+
+                <li class="nav-item">
+                    <a href="{{ route('operator.transaction.trash.index') }}"
+                        class="nav-link {{request()->routeIs('operator.transaction.trash.*')?'active':''}}">
+                        <i class="nav-icon fas fa-trash-alt"></i>
+                        <p>
+                            Transaksi Trash
+                            <span class="badge badge-danger right">{{ historyTrashCount() }}</span>
+                        </p>
+                    </a>
+                </li>
                 @endrole
             </ul>
         </nav>
