@@ -51,6 +51,17 @@
                         </p>
                     </a>
                 </li>
+                
+                <li class="nav-header">Transaksi</li>
+                <li class="nav-item">
+                    <a href="{{ route('transaction.history.index') }}"
+                        class="nav-link {{ request()->routeIs('transaction.history.*')?'active':'' }}">
+                        <i class="nav-icon fas fa-history"></i>
+                        <p>
+                            Histori
+                        </p>
+                    </a>
+                </li>
                 @elserole('operator')
                 <li class="nav-item">
                     <a href="{{ route('operator.member.data.index') }}"
@@ -74,8 +85,8 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ route('operator.transaction.history.index') }}"
-                        class="nav-link {{ request()->routeIs('operator.transaction.history.*')?'active':'' }}">
+                    <a href="{{ route('transaction.history.index') }}"
+                        class="nav-link {{ request()->routeIs('transaction.history.*')?'active':'' }}">
                         <i class="nav-icon fas fa-history"></i>
                         <p>
                             Histori
@@ -117,9 +128,10 @@
                     </a>
                 </li>
 
+                @endrole
                 <li class="nav-item">
-                    <a href="{{ route('operator.transaction.trash.index') }}"
-                        class="nav-link {{request()->routeIs('operator.transaction.trash.*')?'active':''}}">
+                    <a href="{{ route('transaction.trash.index') }}"
+                        class="nav-link {{request()->routeIs('transaction.trash.*')?'active':''}}">
                         <i class="nav-icon fas fa-trash-alt"></i>
                         <p>
                             Transaksi Trash
@@ -127,7 +139,6 @@
                         </p>
                     </a>
                 </li>
-                @endrole
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

@@ -9,7 +9,7 @@
 <div class="col-sm-6">
     <ol class="breadcrumb float-sm-right">
         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('operator.transaction.history.index') }}">Histories</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('transaction.history.index') }}">Histories</a></li>
         <li class="breadcrumb-item active">Transaction Detail</li>
     </ol>
 </div>
@@ -82,7 +82,7 @@
     </div>
     <div class="card-footer">
         <a href="{{-- route('transaction.print',$transaction->invoice) --}}" class="btn btn-primary">Print</a>
-        <a href="{{-- route('report') --}}" class="btn btn-secondary">Kembali</a>
+        <a href="{{ route('transaction.history.index') }}" class="btn btn-secondary">Kembali</a>
     </div>
 </div>
 @endsection

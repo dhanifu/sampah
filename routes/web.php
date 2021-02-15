@@ -77,10 +77,20 @@ Route::name('operator.')->middleware('role:operator')->group(function(){
             Route::get('/', 'Operator\TransactionController@index')->name('index');
             Route::post('/save', 'Operator\TransactionController@store')->name('store');
         });
+    });
+});
 
-        Route::prefix('history')->name('history.')->group(function(){
-            Route::get('/', 'HistoryController@index')->name('index');
-            Route::get('/detail', 'HistoryController@detail')->name('detail');
-        });
+Route::prefix('transaction')->name('transaction.')->middleware('auth')->group(function(){
+    Route::prefix('history')->name('history.')->group(function(){
+        Route::get('/', 'HistoryController@index')->name('index');
+        Route::get('/detail', 'HistoryController@detail')->name('detail');
+        Route::delete('/{trash}/delete', 'HistoryController@destroy')->name('destroy');
+    });
+    Route::prefix('trash')->name('trash.')->group(function(){
+        Route::get('/', 'HistoryController@trash')->name('index');
+        Route::get('/restore/{id}', 'HistoryController@restoreData')->name('restore');
+        Route::get('/permanent-delete/{id}', 'HistoryController@deleteData')->name('delete');
+        Route::get('/restore/all', 'HistoryController@restoreAllData')->name('restore-all');
+        Route::get('/permanent-delete/all', 'HistoryController@deleteAllData')->name('delete-all');
     });
 });
