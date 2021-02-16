@@ -90,7 +90,7 @@ Route::prefix('transaction')->name('transaction.')->middleware('auth')->group(fu
         Route::get('/', 'HistoryController@trash')->name('index');
         Route::get('/restore/{id}', 'HistoryController@restoreData')->name('restore');
         Route::get('/permanent-delete/{id}', 'HistoryController@deleteData')->name('delete');
-        Route::get('/restore/all', 'HistoryController@restoreAllData')->name('restore-all');
-        Route::get('/permanent-delete/all', 'HistoryController@deleteAllData')->name('delete-all');
+        Route::get('/restore', 'HistoryController@restoreAllData')->name('restore-all');
+        Route::get('/permanent-delete', 'HistoryController@deleteAllData')->name('delete-all');
     });
 });

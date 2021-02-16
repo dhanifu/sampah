@@ -135,7 +135,7 @@
                         <i class="nav-icon fas fa-trash-alt"></i>
                         <p>
                             Transaksi Trash
-                            <span class="badge badge-danger right">{{ historyTrashCount() }}</span>
+                            <span class="badge badge-danger right" id="history-count-trash">{{ historyTrashCount() }}</span>
                         </p>
                     </a>
                 </li>

@@ -83,8 +83,12 @@ class HistoryController extends Controller
         try {
             TrashDetail::select('trash_id')->where('trash_id',$trash->id)->delete();
             $trash->delete();
+            $trashCount = Trash::onlyTrashed()->count();
 
-            return response()->json(['success' => 'berhasil dihapus ke tempat sampah']);
+            return response()->json([
+                'success' => 'berhasil dihapus ke tempat sampah',
+                'count' => $trashCount
+            ]);
         } catch (\Illuminate\Database\QueryException $e) {
             return response()->json(['error' => 'gagal menghapus']);
         }
@@ -92,12 +96,49 @@ class HistoryController extends Controller
 
 
     // TRASH
-    public function trash()
+    public function trash(Request $request)
     {
-        $histories = Trash::onlyTrashed()->select(['id','user_id','member_id','date','weight','total'])
-                        ->latest()->with(['user:id,name','member.village:id,name'])
-                        ->paginate(10);
-        return view('history.trash', compact('histories'));
+        
+        if ($request->ajax()) {
+            $histories = Trash::onlyTrashed()->select(['id','user_id','member_id','date','weight','total'])
+                            ->latest()->with(['user:id,name','member.village:id,name'])
+                            ->get();
+            
+            $datatables = Datatables::of($histories)->addIndexColumn()
+                ->editColumn('operator', function($history){
+                    return $history->user->name;
+                })
+                ->editColumn('member', function($history){
+                    return $history->member->name;
+                })
+                ->editColumn('date', function($history){
+                    return localDate($history->date);
+                })
+                ->editColumn('weight', function($history){
+                    return $history->weight . ' Kg';
+                })
+                ->editColumn('total', function($history){
+                    return 'Rp '. number_format($history->total);
+                })
+                ->addColumn('action', function($history){
+                    $detail = route('transaction.history.detail'). '?date=' . $history->date;
+                    return '
+                        <div class="btn-group" role="group" aria-label="Action">
+                            <button type="button" class="btn btn-info btn-sm" title="Restore"
+                                    data-action="restore">
+                                <i class="fas fa-redo-alt fa-flip-horizontal"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" title="Delete Permanent"
+                                    data-action="remove">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    ';
+                })->rawColumns(['action'])->make();
+
+            return $datatables;
+        }
+        return view('history.trash');
     }
 
     public function restoreData($id)
@@ -115,9 +156,12 @@ class HistoryController extends Controller
                 $trash_detail->restore();
                 $trash->restore();
 
-                return back()->with('success', "Berhasil merestore data");
+                return response()->json([
+                    'success'=> "Berhasil merestore data",
+                    'count' => $trashCount = Trash::onlyTrashed()->count()
+                ]);
             } else {
-                return back()->with('error', 'Gagal merestore data');
+                return response()->json(['error'=> 'Gagal merestore data']);
             } 
         } catch (\Illuminate\Database\QueryException $e) {
             return back()->with('error', 'Gagal merestore data. Kesalahan tidak diketahui');
@@ -128,28 +172,76 @@ class HistoryController extends Controller
     {
         $trash = Trash::onlyTrashed()->findOrFail($id);
         $trash_detail = TrashDetail::onlyTrashed()->where('trash_id', $trash->id);
+        $trashCount = Trash::onlyTrashed()->count();
 
         try {
             if ($trash->exists && !empty($trash_detail)) {
                 $trash_detail->forceDelete();
                 $trash->forceDelete();
 
-                return back()->with('success', "Berhasil menghapus data permanen");
+                return response()->json([
+                    'success'=> "Berhasil menghapus data permanen",
+                    'count' => $trashCount
+                ]);
             } else {
-                return back()->with('error', "Gagal menghapus");
+                return response()->json([
+                    'error' => "Gagal menghapus",
+                    'count' => $trashCount
+                ]);
             }
         } catch (\Illuminate\Database\QueryException $e) {
-            return back()->with('error', "Gagal menghapus. Kesalahan tidak diketahui");
+            return response()->json([
+                'error' => "Gagal menghapus. Kesalahan tidak diketahui",
+                'count' => $trashCount
+            ]);
         }
     }
 
     public function restoreAllData()
     {
-        // 
+        $trash = Trash::onlyTrashed();
+        $trash_detail = TrashDetail::onlyTrashed();
+        $trashCount = $trash->count();
+
+        try {
+            $trash_detail->update(['deleted_by'=>null]);
+            $trash->update(['deleted_by'=>null]);
+            $trash_detail->restore();
+            $trash->restore();
+            $trashCount = $trash->count();
+            
+            return response()->json([
+                'success' => 'Berhasil merestore semua data',
+                'count' => $trashCount
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json([
+                'error' => 'Gagal Menghapus.',
+                'count' => $trashCount
+            ]);
+        }
     }
 
     public function deleteAllData()
     {
-        // 
+        $trash_detail = TrashDetail::onlyTrashed();
+        $trash = Trash::onlyTrashed();
+        $trashCount = $trash->count();
+
+        try {
+            $trash_detail->forceDelete();
+            $trash->forceDelete();
+            $trashCount = $trash->count();
+
+            return response()->json([
+                'success' => "Berhasil menghapus semua data secara permanen",
+                'count' => $trashCount
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json([
+                'error' => "Gagal menghapus data",
+                'count' => $trashCount
+            ]);
+        }
     }
 }
