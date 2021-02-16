@@ -86,6 +86,7 @@ jQuery(function ($) {
                         _method: 'DELETE'
                     },
                     success: res => {
+                        $("#history-count-trash").html(res.count)
                         success(res.success)
                     },
                 })
