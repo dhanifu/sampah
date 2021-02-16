@@ -92,12 +92,6 @@
                                 <label for="village_id">Village</label>
                                 <select name="village_id" id="village_id" style="width: 100%"
                                     class="form-control select2 @error('village_id') is-invalid @enderror">
-                                    <option value="">-- Select --</option>
-                                    @foreach ($villages as $v)
-                                    <option value="{{ $v->id }}" {{ old('village_id')==$v->id?'selected':'' }}>
-                                        {{ $v->name }}
-                                    </option>
-                                    @endforeach
                                 </select>
                                 <p class="text-danger">{{ $errors->first('village_id') }}</p>
                             </div>
@@ -128,9 +122,30 @@
 
 @section('script')
 <script>
+    let CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content')
     $(function(){
         $('.select2').select2({
-            theme: 'bootstrap4'
+            placholder: 'Pilih Village',
+            ajax: {
+                url: `{{ route('operator.member.data.select-village') }}`,
+                type: 'post',
+                dataType: 'json',
+                data: params => {
+                    return {
+                        _token: CSRF_TOKEN,
+                        name: params.term
+                    }
+                },
+                processResults: data => {
+                    return {
+                        results: data
+                    }
+                },
+                cache: true
+            },
+            templateSelection: data => {
+                return data.name
+            }
         })
         @if(session('error'))
             Swal.fire({

@@ -110,7 +110,6 @@
                 },
                 cache: true
             },
-            minimumInputLength: 2,
             templateSelection: data => {
                 return data.name
             }

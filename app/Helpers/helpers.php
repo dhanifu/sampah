@@ -3,6 +3,7 @@
 use App\Models\Type;
 use App\Models\Village;
 use App\Models\Member;
+use App\Models\Trash;
 
 function typeTrashCount(){
     $data = Type::onlyTrashed()->count();
@@ -16,6 +17,11 @@ function villageTrashCount(){
 
 function memberTrashCount(){
     $data = Member::onlyTrashed()->count();
+    return $data;
+}
+
+function historyTrashCount(){
+    $data = Trash::onlyTrashed()->count();
     return $data;
 }
 

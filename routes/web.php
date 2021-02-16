@@ -57,6 +57,7 @@ Route::name('operator.')->middleware('role:operator')->group(function(){
         Route::name('data.')->group(function(){
             Route::get('/', 'Operator\MemberController@index')->name('index');
             Route::get('/add', 'Operator\MemberController@create')->name('create');
+            Route::post('/select-village', 'Operator\MemberController@selectVillage')->name('select-village');
             Route::post('/add', 'Operator\MemberController@store')->name('store');
             Route::get('/{member}/edit', 'Operator\MemberController@edit')->name('edit');
             Route::put('/{member}/edit', 'Operator\MemberController@update')->name('update');
@@ -76,10 +77,20 @@ Route::name('operator.')->middleware('role:operator')->group(function(){
             Route::get('/', 'Operator\TransactionController@index')->name('index');
             Route::post('/save', 'Operator\TransactionController@store')->name('store');
         });
+    });
+});
 
-        Route::prefix('history')->name('history.')->group(function(){
-            Route::get('/', 'HistoryController@index')->name('index');
-            Route::get('/detail', 'HistoryController@detail')->name('detail');
-        });
+Route::prefix('transaction')->name('transaction.')->middleware('auth')->group(function(){
+    Route::prefix('history')->name('history.')->group(function(){
+        Route::get('/', 'HistoryController@index')->name('index');
+        Route::get('/detail', 'HistoryController@detail')->name('detail');
+        Route::delete('/{trash}/delete', 'HistoryController@destroy')->name('destroy');
+    });
+    Route::prefix('trash')->name('trash.')->group(function(){
+        Route::get('/', 'HistoryController@trash')->name('index');
+        Route::get('/restore/{id}', 'HistoryController@restoreData')->name('restore');
+        Route::get('/permanent-delete/{id}', 'HistoryController@deleteData')->name('delete');
+        Route::get('/restore', 'HistoryController@restoreAllData')->name('restore-all');
+        Route::get('/permanent-delete', 'HistoryController@deleteAllData')->name('delete-all');
     });
 });

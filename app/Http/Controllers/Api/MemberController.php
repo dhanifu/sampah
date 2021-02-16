@@ -12,7 +12,7 @@ class MemberController extends Controller
     public function index(Request $request)
     {
         $members = Member::with('village:id,name as desa')->select(['id','name','village_id'])->where('name', 'like', "%{$request->name}%")
-                    ->orderBy('name', 'ASC')->get()->take(5);
+                    ->latest()->get()->take(5);
         $result = [];
 
         foreach ($members as $member) {

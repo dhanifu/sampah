@@ -3,15 +3,63 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Yajra\Datatables\Datatables;
 
 use App\Models\Trash;
 use App\Models\TrashDetail;
 
 class HistoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('operator.transaction.history.index');
+        if ($request->ajax()) {
+            if (!empty($request->from_date)) {
+                $start = $request->from_date . ' 00:00:00';
+                $end = $request->to_date . ' 23:59:59';
+                $histories = Trash::select(['id','user_id','member_id','date','weight','total'])
+                    ->whereBetween('created_at', [$start, $end])
+                    ->with(['user:id,name','member.village:id,name'])->get();
+            } else {
+                $histories = Trash::select(['id','user_id','member_id','date','weight','total'])
+                    ->with(['user:id,name','member.village:id,name'])->get();
+            }
+
+
+            $datatables = Datatables::of($histories)->addIndexColumn()
+                ->editColumn('operator', function($history){
+                    return $history->user->name;
+                })
+                ->editColumn('member', function($history){
+                    return $history->member->name;
+                })
+                ->editColumn('date', function($history){
+                    return localDate($history->date);
+                })
+                ->editColumn('weight', function($history){
+                    return $history->weight . ' Kg';
+                })
+                ->editColumn('total', function($history){
+                    return 'Rp '. number_format($history->total);
+                })
+                ->addColumn('action', function($history){
+                    $detail = route('transaction.history.detail'). '?date=' . $history->date;
+                    return '
+                        <div class="btn-group" role="group" aria-label="Action">
+                            <a class="btn btn-info btn-sm"
+                                    href="'.$detail.'">
+                                <i class="fas fa-info-circle"></i>
+                            </a>
+                            <button type="button" class="btn btn-danger btn-sm" id="remove" data-id="'.$history->id.'">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    ';
+                })->rawColumns(['action'])->make();
+
+            return $datatables;
+        }
+
+        return view('history.index');
     }
 
     public function detail(Request $request)
@@ -27,7 +75,173 @@ class HistoryController extends Controller
                         ->firstOrFail();
         // dd($trash);
 
-        return view('operator.transaction.history.detail', compact('data','transaction'));
+        return view('history.detail', compact('data','transaction'));
     }
 
+    public function destroy(Trash $trash)
+    {
+        try {
+            TrashDetail::select('trash_id')->where('trash_id',$trash->id)->delete();
+            $trash->delete();
+            $trashCount = Trash::onlyTrashed()->count();
+
+            return response()->json([
+                'success' => 'berhasil dihapus ke tempat sampah',
+                'count' => $trashCount
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json(['error' => 'gagal menghapus']);
+        }
+    }
+
+
+    // TRASH
+    public function trash(Request $request)
+    {
+        
+        if ($request->ajax()) {
+            $histories = Trash::onlyTrashed()->select(['id','user_id','member_id','date','weight','total'])
+                            ->latest()->with(['user:id,name','member.village:id,name'])
+                            ->get();
+            
+            $datatables = Datatables::of($histories)->addIndexColumn()
+                ->editColumn('operator', function($history){
+                    return $history->user->name;
+                })
+                ->editColumn('member', function($history){
+                    return $history->member->name;
+                })
+                ->editColumn('date', function($history){
+                    return localDate($history->date);
+                })
+                ->editColumn('weight', function($history){
+                    return $history->weight . ' Kg';
+                })
+                ->editColumn('total', function($history){
+                    return 'Rp '. number_format($history->total);
+                })
+                ->addColumn('action', function($history){
+                    $detail = route('transaction.history.detail'). '?date=' . $history->date;
+                    return '
+                        <div class="btn-group" role="group" aria-label="Action">
+                            <button type="button" class="btn btn-info btn-sm" title="Restore"
+                                    data-action="restore">
+                                <i class="fas fa-redo-alt fa-flip-horizontal"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" title="Delete Permanent"
+                                    data-action="remove">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    ';
+                })->rawColumns(['action'])->make();
+
+            return $datatables;
+        }
+        return view('history.trash');
+    }
+
+    public function restoreData($id)
+    {
+        $trash = Trash::onlyTrashed()->findOrFail($id);
+        $trash_detail = TrashDetail::onlyTrashed()->where('trash_id', $trash->id);
+
+        try {
+            if ($trash->exists && !empty($trash_detail)) {
+                // Update deleted_by menjadi null
+                $trash_detail->update(['deleted_by'=>null]);
+                $trash->update(['deleted_by'=>null]);
+
+                // Restore datanya
+                $trash_detail->restore();
+                $trash->restore();
+
+                return response()->json([
+                    'success'=> "Berhasil merestore data",
+                    'count' => $trashCount = Trash::onlyTrashed()->count()
+                ]);
+            } else {
+                return response()->json(['error'=> 'Gagal merestore data']);
+            } 
+        } catch (\Illuminate\Database\QueryException $e) {
+            return back()->with('error', 'Gagal merestore data. Kesalahan tidak diketahui');
+        }
+    }
+
+    public function deleteData($id)
+    {
+        $trash = Trash::onlyTrashed()->findOrFail($id);
+        $trash_detail = TrashDetail::onlyTrashed()->where('trash_id', $trash->id);
+        $trashCount = Trash::onlyTrashed()->count();
+
+        try {
+            if ($trash->exists && !empty($trash_detail)) {
+                $trash_detail->forceDelete();
+                $trash->forceDelete();
+
+                return response()->json([
+                    'success'=> "Berhasil menghapus data permanen",
+                    'count' => $trashCount
+                ]);
+            } else {
+                return response()->json([
+                    'error' => "Gagal menghapus",
+                    'count' => $trashCount
+                ]);
+            }
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json([
+                'error' => "Gagal menghapus. Kesalahan tidak diketahui",
+                'count' => $trashCount
+            ]);
+        }
+    }
+
+    public function restoreAllData()
+    {
+        $trash = Trash::onlyTrashed();
+        $trash_detail = TrashDetail::onlyTrashed();
+        $trashCount = $trash->count();
+
+        try {
+            $trash_detail->update(['deleted_by'=>null]);
+            $trash->update(['deleted_by'=>null]);
+            $trash_detail->restore();
+            $trash->restore();
+            $trashCount = $trash->count();
+            
+            return response()->json([
+                'success' => 'Berhasil merestore semua data',
+                'count' => $trashCount
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json([
+                'error' => 'Gagal Menghapus.',
+                'count' => $trashCount
+            ]);
+        }
+    }
+
+    public function deleteAllData()
+    {
+        $trash_detail = TrashDetail::onlyTrashed();
+        $trash = Trash::onlyTrashed();
+        $trashCount = $trash->count();
+
+        try {
+            $trash_detail->forceDelete();
+            $trash->forceDelete();
+            $trashCount = $trash->count();
+
+            return response()->json([
+                'success' => "Berhasil menghapus semua data secara permanen",
+                'count' => $trashCount
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json([
+                'error' => "Gagal menghapus data",
+                'count' => $trashCount
+            ]);
+        }
+    }
 }
