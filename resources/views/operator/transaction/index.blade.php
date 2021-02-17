@@ -253,7 +253,7 @@
                 $('#save').attr('disabled', false)
             }
         }).then((response) => {
-            let tanggal = response.tanggal.date
+            let tanggal = response.tanggal
             detailTransaksi(tanggal)
         })
     })

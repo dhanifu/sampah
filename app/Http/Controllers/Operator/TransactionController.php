@@ -67,7 +67,7 @@ class TransactionController extends Controller
             $trash->update(['total' => $total]);
 
             DB::commit();
-            return response()->json(['success' => 'Transaksi Sukses', 'tanggal' => $date]);
+            return response()->json(['success' => 'Transaksi Sukses', 'tanggal' => $date->date]);
         } catch(\Exception $e) {
 
             DB::rollback();
