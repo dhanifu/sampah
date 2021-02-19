@@ -85,6 +85,7 @@ Route::prefix('transaction')->name('transaction.')->middleware('auth')->group(fu
         Route::get('/', 'HistoryController@index')->name('index');
         Route::get('/detail', 'HistoryController@detail')->name('detail');
         Route::delete('/{trash}/delete', 'HistoryController@destroy')->name('destroy');
+        Route::get('/pdf/{date}', 'HistoryController@historyPdf')->name('history-pdf');
     });
     Route::prefix('trash')->name('trash.')->group(function(){
         Route::get('/', 'HistoryController@trash')->name('index');

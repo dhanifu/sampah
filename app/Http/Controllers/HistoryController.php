@@ -9,6 +9,8 @@ use Carbon\Carbon;
 use App\Models\Trash;
 use App\Models\TrashDetail;
 
+use PDF;
+
 class HistoryController extends Controller
 {
     public function index(Request $request)
@@ -255,5 +257,34 @@ class HistoryController extends Controller
                 'count' => $trashCount
             ]);
         }
+    }
+
+    public function historyPdf($daterange)
+    {
+        $date = explode('+', $daterange);
+
+        $start = Carbon::parse($date[0])->format('Y-m-d'). ' 00:00:01';
+        $end = Carbon::parse($date[1])->format('Y-m-d'). ' 23:59:59';
+
+        $trashes = TrashDetail::select(['id','trash_id','type_id','weight','price','subtotal','created_at'])
+                            ->whereHas('trash', function($q) use ($start, $end) {
+                                $q->whereBetween('date', [$start, $end]);
+                            })->orderBy('created_at', 'ASC')
+                            ->with(['trash.user', 'trash.member.village'])
+                            ->get();
+
+        // buat test tampilan
+        // return view('history.pdf.history_pdf', compact('trashes', 'date'));
+
+        $pdf = PDF::setOptions([
+                    'dpi' => 150,
+                ])->loadView('history.pdf.history_pdf', compact('trashes', 'date'));
+
+        return $pdf->download('history-transaksi_' . $date[0] . '-' . $date[1] . '.pdf');
+    }
+
+    public function detailPdf($daterange)
+    {
+        // 
     }
 }
