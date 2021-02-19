@@ -37,6 +37,14 @@
         @enderror
     </div>
     <div class="row">
+        <div class="col-12">
+            <div class="icheck-primary">
+                <input type="checkbox" id="show-password" name="" class="form-check-input" onclick="showPassword()">
+                <label for="show-password">Show Password</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-8">
             <div class="icheck-primary">
                 <input class="form-check-input" type="checkbox" name="remember" id="remember"
@@ -67,3 +75,16 @@
     @endif
 </p>
 @endsection
+
+@push('script')
+    <script>
+        function showPassword(){
+            const password = document.getElementById('password')
+            if (password.type == "password") {
+                password.type = "text"
+            } else {
+                password.type = "password"
+            }
+        }
+    </script>
+@endpush
