@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
+use Carbon\Carbon;
 
 use App\Models\Trash;
 use App\Models\TrashDetail;
@@ -155,16 +156,25 @@ class HistoryController extends Controller
                 // Restore datanya
                 $trash_detail->restore();
                 $trash->restore();
+                $trashCount = Trash::onlyTrashed()->count();
 
                 return response()->json([
                     'success'=> "Berhasil merestore data",
-                    'count' => $trashCount = Trash::onlyTrashed()->count()
+                    'count' => $trashCount
                 ]);
             } else {
-                return response()->json(['error'=> 'Gagal merestore data']);
+                $trashCount = Trash::onlyTrashed()->count();
+                return response()->json([
+                    'error' => "Gagal merestore data",
+                    'count' => $trashCount
+                ]);
             } 
         } catch (\Illuminate\Database\QueryException $e) {
-            return back()->with('error', 'Gagal merestore data. Kesalahan tidak diketahui');
+            $trashCount = Trash::onlyTrashed()->count();
+            return response()->json([
+                'error' => "Gagal merestore data",
+                'count' => $trashCount
+            ]);
         }
     }
 
@@ -172,24 +182,26 @@ class HistoryController extends Controller
     {
         $trash = Trash::onlyTrashed()->findOrFail($id);
         $trash_detail = TrashDetail::onlyTrashed()->where('trash_id', $trash->id);
-        $trashCount = Trash::onlyTrashed()->count();
 
         try {
             if ($trash->exists && !empty($trash_detail)) {
                 $trash_detail->forceDelete();
                 $trash->forceDelete();
+                $trashCount = Trash::onlyTrashed()->count();
 
                 return response()->json([
                     'success'=> "Berhasil menghapus data permanen",
                     'count' => $trashCount
                 ]);
             } else {
+                $trashCount = Trash::onlyTrashed()->count();
                 return response()->json([
                     'error' => "Gagal menghapus",
                     'count' => $trashCount
                 ]);
             }
         } catch (\Illuminate\Database\QueryException $e) {
+            $trashCount = Trash::onlyTrashed()->count();
             return response()->json([
                 'error' => "Gagal menghapus. Kesalahan tidak diketahui",
                 'count' => $trashCount
@@ -201,20 +213,20 @@ class HistoryController extends Controller
     {
         $trash = Trash::onlyTrashed();
         $trash_detail = TrashDetail::onlyTrashed();
-        $trashCount = $trash->count();
 
         try {
             $trash_detail->update(['deleted_by'=>null]);
             $trash->update(['deleted_by'=>null]);
             $trash_detail->restore();
             $trash->restore();
-            $trashCount = $trash->count();
+            $trashCount = Trash::onlyTrashed()->count();
             
             return response()->json([
                 'success' => 'Berhasil merestore semua data',
                 'count' => $trashCount
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
+            $trashCount = Trash::onlyTrashed()->count();
             return response()->json([
                 'error' => 'Gagal Menghapus.',
                 'count' => $trashCount
@@ -226,18 +238,18 @@ class HistoryController extends Controller
     {
         $trash_detail = TrashDetail::onlyTrashed();
         $trash = Trash::onlyTrashed();
-        $trashCount = $trash->count();
 
         try {
             $trash_detail->forceDelete();
             $trash->forceDelete();
-            $trashCount = $trash->count();
+            $trashCount = Trash::onlyTrashed()->count();
 
             return response()->json([
                 'success' => "Berhasil menghapus semua data secara permanen",
                 'count' => $trashCount
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
+            $trashCount = Trash::onlyTrashed()->count();
             return response()->json([
                 'error' => "Gagal menghapus data",
                 'count' => $trashCount
