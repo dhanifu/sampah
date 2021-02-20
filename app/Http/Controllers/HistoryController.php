@@ -276,15 +276,40 @@ class HistoryController extends Controller
         // buat test tampilan
         // return view('history.pdf.history_pdf', compact('trashes', 'date'));
 
-        $pdf = PDF::setOptions([
-                    'dpi' => 150,
-                ])->loadView('history.pdf.history_pdf', compact('trashes', 'date'));
+        $pdf = PDF::loadView('history.pdf.history_pdf', compact('trashes', 'date'))
+                ->setPaper('A4','potrait');
 
+        return $pdf->stream();
         return $pdf->download('history-transaksi_' . $date[0] . '-' . $date[1] . '.pdf');
     }
 
-    public function detailPdf($daterange)
+    function tanggal(string $date): String
     {
-        // 
+        return date('Y-m-d', strtotime($date));
+    }
+    function waktu(string $time): String
+    {
+        return date('H-i', strtotime($time));
+    }
+
+    public function detailPdf($date)
+    {
+        $data = TrashDetail::select(['id','trash_id','type_id','weight','price','subtotal','created_at'])
+                ->where('created_at', $date)
+                ->with(['trash.user', 'trash.member.village'])
+                ->get();
+        $transaction = Trash::select(['id','user_id','member_id','date','weight','total'])
+                ->where('date', $date)
+                ->with(['user:id,name', 'member.village:id,name'])
+                ->firstOrFail();
+
+        // return view('history.pdf.detail_pdf', compact('data', 'date', 'transaction'));
+
+        $pdf = PDF::loadView('history.pdf.detail_pdf', compact('data', 'date', 'transaction'))
+                ->setPaper('A4','potrait');
+        $tanggal = $this->tanggal($date);
+        $waktu = $this->waktu($date);
+        // return $pdf->stream();
+        return $pdf->download("detail-transaksi_tanggal($tanggal)_jam($waktu).pdf");
     }
 }
