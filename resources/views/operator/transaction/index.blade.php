@@ -240,22 +240,23 @@
             success: async function(data)
             {
                 if (data.error) {
-                    $('#result').html('<div class="alert alert-danger">'+data.error+'</div>')
+                    $('#result').html(`<div class="alert alert-danger">${data.error}</div>`)
                 } else {
-                    $('#result').html('<div class="alert alert-success">'+data.success+'</div>')
+                    $('#result').html(`<div class="alert alert-success">${data.success}</div>`)
                     $("#dynamic_field").html('')
                     getNumberOfTr()
                     field_dinamis()
                     $('#add').click(function(){
                         field_dinamis()
                     })
+                    detailTransaksi(data.tanggal)
                 }
                 $('#save').attr('disabled', false)
             }
-        }).then((response) => {
-            let tanggal = response.tanggal.date
+        })/*.then((response) => {
+            let tanggal = response.tanggal
             detailTransaksi(tanggal)
-        })
+        })*/
     })
     function detailTransaksi(tanggal) {
         setTimeout(function() {

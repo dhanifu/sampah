@@ -49,14 +49,14 @@
                         <i class="fa fa-redo-alt"></i>
                     </button>
                 </div>
-                <div class="input-group mb-3 col-md-8 float-right input-daterange">
+                <div class="input-group col-md-8 float-right input-daterange">
                     <input type="text" name="from_date" id="from_date" class="form-control" placeholder="From Date" readonly />
                     <input type="text" name="to_date" id="to_date" class="form-control" placeholder="To Date" readonly />
                     <div class="input-group-append">
                         <button class="btn btn-secondary" id="filter" type="button">Filter</button>
                     </div>
-                    <a target="_blank" class="btn btn-primary ml-2 text-white" id="exportpdf">Export PDF</a>
-                    <a target="_blank" class="btn btn-success ml-2 text-white" id="exportexcel">Export Excel</a>
+                    <button class="btn btn-primary ml-2 text-white" id="exportpdf" disabled>Export PDF</button>
+                    <button class="btn btn-success ml-2 text-white" id="exportexcel" disabled>Export Excel</button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-bordered">
@@ -84,7 +84,7 @@
 <!-- DataTables -->
 <link rel="stylesheet" href="{{ asset('admin/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
 <link rel="stylesheet" href="{{ asset('admin/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
 @endsection
 
 @section('script')
@@ -93,18 +93,19 @@
 <script src="{{ asset('admin/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('admin/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
 <script src="{{ asset('admin/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 
 <script>
     const ajaxUrl = '{{ route('transaction.history.index') }}'
     const deleteUrl = '{{ route('transaction.history.destroy', ':id') }}'
+    const pdfUrl = '{{ route('transaction.history.history-pdf', ':date') }}'
     const csrf = '{{ csrf_token() }}'
     $('.input-daterange').datepicker({
         todayBtn:'linked',
         format:'yyyy-mm-dd',
         autoclose:true
     });
-    
+
 </script>
 <script src="{{ asset('js/history.js') }}"></script>
 @endsection

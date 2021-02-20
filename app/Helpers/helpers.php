@@ -39,3 +39,8 @@ function localDateTime(string $date): String
 {
     return date('d M Y | H:i', strtotime($date));
 }
+
+function getTime(string $time): String
+{
+    return date('H:i', strtotime($time));
+}

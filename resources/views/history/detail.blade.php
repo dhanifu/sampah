@@ -81,7 +81,7 @@
         </div>
     </div>
     <div class="card-footer">
-        <a href="{{-- route('transaction.print',$transaction->invoice) --}}" class="btn btn-primary">Print</a>
+        <button class="btn btn-primary" onclick="document.location.href='{{ route('transaction.history.detail-pdf',request()->date) }}'">Print</button>
         <a href="{{ route('transaction.history.index') }}" class="btn btn-secondary">Kembali</a>
     </div>
 </div>
