@@ -55,10 +55,27 @@
                     <div class="input-group-append">
                         <button class="btn btn-secondary" id="filter" type="button">Filter</button>
                     </div>
-                    <button class="btn btn-primary ml-2 text-white" id="exportpdf" disabled>Export PDF</button>
-                    <button class="btn btn-success ml-2 text-white" id="exportexcel" disabled>Export Excel</button>
+
+                    <div class="btn-group-vertical">
+                        <div class="btn-group" role="group">
+                            <button id="btnExport" type="button" class="btn btn-primary dropdown-toggle ml-2" 
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>
+                                Export
+                            </button>
+                            <div class="dropdown-menu mr-5" aria-labelledby="btnExport">
+                                <a href="javascript:void(0)" class="dropdown-item" id="exportpdf">
+                                    PDF <i class="far fa-file-excel float-right"></i>
+                                </a>
+                                <a href="javascript:void(0)" class="dropdown-item" id="exportexcel">
+                                    Excel <i class="far fa-file-pdf float-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="table-responsive">
+                    <br>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -99,6 +116,7 @@
     const ajaxUrl = '{{ route('transaction.history.index') }}'
     const deleteUrl = '{{ route('transaction.history.destroy', ':id') }}'
     const pdfUrl = '{{ route('transaction.history.history-pdf', ':date') }}'
+    const excelUrl = '{{ route('transaction.history.history-excel', ':date') }}'
     const csrf = '{{ csrf_token() }}'
     $('.input-daterange').datepicker({
         todayBtn:'linked',
