@@ -99,17 +99,19 @@ jQuery(function ($) {
         let from_date = $("#from_date").val();
         let to_date = $("#to_date").val();
 
-        let url = pdfUrl.replace(":date", `${from_date}+${to_date}`);
-
         if (from_date != "" && to_date != "") {
             $("table").DataTable().destroy();
             table(from_date, to_date);
 
+            let url = pdfUrl.replace(":date", `${from_date}+${to_date}`);
+            let urlExcel = excelUrl.replace(":date", `${from_date}+${to_date}`);
             setTimeout(() => {
-                $("#exportpdf").attr("disabled", false);
-                $("#exportexcel").attr("disabled", false);
+                $("#btnExport").attr("disabled", false);
                 $("#exportpdf").on("click", function () {
                     document.location.href = url;
+                });
+                $("#exportexcel").on("click", function () {
+                    document.location.href = urlExcel;
                 });
             }, 700);
         } else {

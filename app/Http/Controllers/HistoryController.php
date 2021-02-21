@@ -10,6 +10,8 @@ use App\Models\Trash;
 use App\Models\TrashDetail;
 
 use PDF;
+use Excel;
+use App\Exports\HistoryReport;
 
 class HistoryController extends Controller
 {
@@ -19,40 +21,40 @@ class HistoryController extends Controller
             if (!empty($request->from_date)) {
                 $start = $request->from_date . ' 00:00:00';
                 $end = $request->to_date . ' 23:59:59';
-                $histories = Trash::select(['id','user_id','member_id','date','weight','total'])
+                $histories = Trash::select(['id', 'user_id', 'member_id', 'date', 'weight', 'total'])
                     ->whereBetween('created_at', [$start, $end])
-                    ->with(['user:id,name','member.village:id,name'])->get();
+                    ->with(['user:id,name', 'member.village:id,name'])->get();
             } else {
-                $histories = Trash::select(['id','user_id','member_id','date','weight','total'])
-                    ->with(['user:id,name','member.village:id,name'])->get();
+                $histories = Trash::select(['id', 'user_id', 'member_id', 'date', 'weight', 'total'])
+                    ->with(['user:id,name', 'member.village:id,name'])->get();
             }
 
 
             $datatables = Datatables::of($histories)->addIndexColumn()
-                ->editColumn('operator', function($history){
+                ->editColumn('operator', function ($history) {
                     return $history->user->name;
                 })
-                ->editColumn('member', function($history){
+                ->editColumn('member', function ($history) {
                     return $history->member->name;
                 })
-                ->editColumn('date', function($history){
+                ->editColumn('date', function ($history) {
                     return localDate($history->date);
                 })
-                ->editColumn('weight', function($history){
+                ->editColumn('weight', function ($history) {
                     return $history->weight . ' Kg';
                 })
-                ->editColumn('total', function($history){
-                    return 'Rp '. number_format($history->total);
+                ->editColumn('total', function ($history) {
+                    return 'Rp ' . number_format($history->total);
                 })
-                ->addColumn('action', function($history){
-                    $detail = route('transaction.history.detail'). '?date=' . $history->date;
+                ->addColumn('action', function ($history) {
+                    $detail = route('transaction.history.detail') . '?date=' . $history->date;
                     return '
                         <div class="btn-group" role="group" aria-label="Action">
                             <a class="btn btn-info btn-sm"
-                                    href="'.$detail.'">
+                                    href="' . $detail . '">
                                 <i class="fas fa-info-circle"></i>
                             </a>
-                            <button type="button" class="btn btn-danger btn-sm" id="remove" data-id="'.$history->id.'">
+                            <button type="button" class="btn btn-danger btn-sm" id="remove" data-id="' . $history->id . '">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </div>
@@ -67,24 +69,24 @@ class HistoryController extends Controller
 
     public function detail(Request $request)
     {
-        $data = TrashDetail::select(['id','trash_id','type_id','weight','price','subtotal','created_at'])
-                ->where('created_at', $request->date)
-                ->with(['trash.user', 'trash.member.village'])
-                ->get();
+        $data = TrashDetail::select(['id', 'trash_id', 'type_id', 'weight', 'price', 'subtotal', 'created_at'])
+            ->where('created_at', $request->date)
+            ->with(['trash.user', 'trash.member.village'])
+            ->get();
 
-        $transaction = Trash::select(['id','user_id','member_id','date','weight','total'])
-                        ->where('date', $request->date)
-                        ->with(['user:id,name', 'member:id,name'])
-                        ->firstOrFail();
+        $transaction = Trash::select(['id', 'user_id', 'member_id', 'date', 'weight', 'total'])
+            ->where('date', $request->date)
+            ->with(['user:id,name', 'member:id,name'])
+            ->firstOrFail();
         // dd($trash);
 
-        return view('history.detail', compact('data','transaction'));
+        return view('history.detail', compact('data', 'transaction'));
     }
 
     public function destroy(Trash $trash)
     {
         try {
-            TrashDetail::select('trash_id')->where('trash_id',$trash->id)->delete();
+            TrashDetail::select('trash_id')->where('trash_id', $trash->id)->delete();
             $trash->delete();
             $trashCount = Trash::onlyTrashed()->count();
 
@@ -101,30 +103,30 @@ class HistoryController extends Controller
     // TRASH
     public function trash(Request $request)
     {
-        
+
         if ($request->ajax()) {
-            $histories = Trash::onlyTrashed()->select(['id','user_id','member_id','date','weight','total'])
-                            ->latest()->with(['user:id,name','member.village:id,name'])
-                            ->get();
-            
+            $histories = Trash::onlyTrashed()->select(['id', 'user_id', 'member_id', 'date', 'weight', 'total'])
+                ->latest()->with(['user:id,name', 'member.village:id,name'])
+                ->get();
+
             $datatables = Datatables::of($histories)->addIndexColumn()
-                ->editColumn('operator', function($history){
+                ->editColumn('operator', function ($history) {
                     return $history->user->name;
                 })
-                ->editColumn('member', function($history){
+                ->editColumn('member', function ($history) {
                     return $history->member->name;
                 })
-                ->editColumn('date', function($history){
+                ->editColumn('date', function ($history) {
                     return localDate($history->date);
                 })
-                ->editColumn('weight', function($history){
+                ->editColumn('weight', function ($history) {
                     return $history->weight . ' Kg';
                 })
-                ->editColumn('total', function($history){
-                    return 'Rp '. number_format($history->total);
+                ->editColumn('total', function ($history) {
+                    return 'Rp ' . number_format($history->total);
                 })
-                ->addColumn('action', function($history){
-                    $detail = route('transaction.history.detail'). '?date=' . $history->date;
+                ->addColumn('action', function ($history) {
+                    $detail = route('transaction.history.detail') . '?date=' . $history->date;
                     return '
                         <div class="btn-group" role="group" aria-label="Action">
                             <button type="button" class="btn btn-info btn-sm" title="Restore"
@@ -152,8 +154,8 @@ class HistoryController extends Controller
         try {
             if ($trash->exists && !empty($trash_detail)) {
                 // Update deleted_by menjadi null
-                $trash_detail->update(['deleted_by'=>null]);
-                $trash->update(['deleted_by'=>null]);
+                $trash_detail->update(['deleted_by' => null]);
+                $trash->update(['deleted_by' => null]);
 
                 // Restore datanya
                 $trash_detail->restore();
@@ -161,7 +163,7 @@ class HistoryController extends Controller
                 $trashCount = Trash::onlyTrashed()->count();
 
                 return response()->json([
-                    'success'=> "Berhasil merestore data",
+                    'success' => "Berhasil merestore data",
                     'count' => $trashCount
                 ]);
             } else {
@@ -170,7 +172,7 @@ class HistoryController extends Controller
                     'error' => "Gagal merestore data",
                     'count' => $trashCount
                 ]);
-            } 
+            }
         } catch (\Illuminate\Database\QueryException $e) {
             $trashCount = Trash::onlyTrashed()->count();
             return response()->json([
@@ -192,7 +194,7 @@ class HistoryController extends Controller
                 $trashCount = Trash::onlyTrashed()->count();
 
                 return response()->json([
-                    'success'=> "Berhasil menghapus data permanen",
+                    'success' => "Berhasil menghapus data permanen",
                     'count' => $trashCount
                 ]);
             } else {
@@ -217,12 +219,12 @@ class HistoryController extends Controller
         $trash_detail = TrashDetail::onlyTrashed();
 
         try {
-            $trash_detail->update(['deleted_by'=>null]);
-            $trash->update(['deleted_by'=>null]);
+            $trash_detail->update(['deleted_by' => null]);
+            $trash->update(['deleted_by' => null]);
             $trash_detail->restore();
             $trash->restore();
             $trashCount = Trash::onlyTrashed()->count();
-            
+
             return response()->json([
                 'success' => 'Berhasil merestore semua data',
                 'count' => $trashCount
@@ -263,23 +265,23 @@ class HistoryController extends Controller
     {
         $date = explode('+', $daterange);
 
-        $start = Carbon::parse($date[0])->format('Y-m-d'). ' 00:00:01';
-        $end = Carbon::parse($date[1])->format('Y-m-d'). ' 23:59:59';
+        $start = Carbon::parse($date[0])->format('Y-m-d') . ' 00:00:01';
+        $end = Carbon::parse($date[1])->format('Y-m-d') . ' 23:59:59';
 
-        $trashes = TrashDetail::select(['id','trash_id','type_id','weight','price','subtotal','created_at'])
-                            ->whereHas('trash', function($q) use ($start, $end) {
-                                $q->whereBetween('date', [$start, $end]);
-                            })->orderBy('created_at', 'ASC')
-                            ->with(['trash.user', 'trash.member.village'])
-                            ->get();
+        $trashes = TrashDetail::select(['id', 'trash_id', 'type_id', 'weight', 'price', 'subtotal', 'created_at'])
+            ->whereHas('trash', function ($q) use ($start, $end) {
+                $q->whereBetween('date', [$start, $end]);
+            })->orderBy('created_at', 'ASC')
+            ->with(['trash.user', 'trash.member.village'])
+            ->get();
 
         // buat test tampilan
         // return view('history.pdf.history_pdf', compact('trashes', 'date'));
 
         $pdf = PDF::loadView('history.pdf.history_pdf', compact('trashes', 'date'))
-                ->setPaper('A4','potrait');
+            ->setPaper('A4', 'potrait');
 
-        return $pdf->stream();
+        // return $pdf->stream();
         return $pdf->download('history-transaksi_' . $date[0] . '-' . $date[1] . '.pdf');
     }
 
@@ -294,22 +296,33 @@ class HistoryController extends Controller
 
     public function detailPdf($date)
     {
-        $data = TrashDetail::select(['id','trash_id','type_id','weight','price','subtotal','created_at'])
-                ->where('created_at', $date)
-                ->with(['trash.user', 'trash.member.village'])
-                ->get();
-        $transaction = Trash::select(['id','user_id','member_id','date','weight','total'])
-                ->where('date', $date)
-                ->with(['user:id,name', 'member.village:id,name'])
-                ->firstOrFail();
+        $data = TrashDetail::select(['id', 'trash_id', 'type_id', 'weight', 'price', 'subtotal', 'created_at'])
+            ->where('created_at', $date)
+            ->with(['trash.user', 'trash.member.village'])
+            ->get();
+        $transaction = Trash::select(['id', 'user_id', 'member_id', 'date', 'weight', 'total'])
+            ->where('date', $date)
+            ->with(['user:id,name', 'member.village:id,name'])
+            ->firstOrFail();
 
         // return view('history.pdf.detail_pdf', compact('data', 'date', 'transaction'));
 
         $pdf = PDF::loadView('history.pdf.detail_pdf', compact('data', 'date', 'transaction'))
-                ->setPaper('A4','potrait');
+            ->setPaper('A4', 'potrait');
         $tanggal = $this->tanggal($date);
         $waktu = $this->waktu($date);
         // return $pdf->stream();
         return $pdf->download("detail-transaksi_tanggal($tanggal)_jam($waktu).pdf");
+    }
+
+    public function historyExcel($daterange)
+    {
+        $date = explode('+', $daterange);
+
+        $start = Carbon::parse($date[0])->format('Y-m-d') . ' 00:00:01';
+        $end = Carbon::parse($date[1])->format('Y-m-d') . ' 23:59:59';
+
+        $history = new HistoryReport($start, $end);
+        return $history->download('history-transaksi_' . $date[0] . '-' . $date[1] . '.xlsx');
     }
 }
