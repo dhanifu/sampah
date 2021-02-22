@@ -41,6 +41,12 @@ jQuery(function ($) {
 
     $("#refresh").on("click", function () {
         refresh();
+        let from_date = $("#from_date").val();
+        let to_date = $("#to_date").val();
+
+        if (from_date == "" && to_date == "") {
+            $("#btnExport").attr("disabled", true);
+        }
     });
 
     const success = (msg) => {
@@ -49,7 +55,6 @@ jQuery(function ($) {
             title: msg,
             showConfirmButton: false,
             timer: 1500,
-            timerProgressBar: true,
         });
 
         refresh();
@@ -60,7 +65,6 @@ jQuery(function ($) {
             title: msg,
             showConfirmButton: false,
             timer: 1500,
-            timerProgressBar: true,
         });
     };
 
