@@ -167,17 +167,17 @@
                     <select name="transactions[${index}][type_id]" class="form-control select-${index}"></select>
                 </td>
                 <td>
-                    <input type="number" name="transactions[${index}][price]" class="form-control" readonly>
+                    <input type="number" name="transactions[${index}][price]" class="form-control" placeholder="0" readonly>
                 </td>
                 <td>
-                    <input type="text" name="transactions[${index}][weight]" class="form-control" disabled maxlength="3" onkeypress="return onlyNumber(event)">
+                    <input type="text" name="transactions[${index}][weight]" class="form-control" placeholder="0" disabled maxlength="3" onkeypress="return onlyNumber(event)">
                 </td>
                 <td>
-                    <input type="number" name="transactions[${index}][subtotal]" class="form-control" readonly>
+                    <input type="number" name="transactions[${index}][subtotal]" class="form-control" placeholder="0" readonly>
                 </td>`
         if (index >= 1) {
             html += `<td>
-                    <button type="text" name="remove" class="btn btn-danger text-white btn_remove"><i class="fa fa-trash"></i></button>
+                    <button type="button" name="remove" class="btn btn-danger text-white btn_remove"><i class="fa fa-trash"></i></button>
                 </td></tr>`
             $("#dynamic_field").append(html)
         } else {
